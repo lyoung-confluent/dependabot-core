@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "rubygems_version_patch"
-
 module Dependabot
   class Dependency
     @production_checks = {}

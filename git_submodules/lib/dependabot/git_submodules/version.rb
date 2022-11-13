@@ -4,7 +4,7 @@ require "dependabot/utils"
 
 module Dependabot
   module GitSubmodules
-    class Version < Gem::Version
+    class Version < Dependabot::Version
     end
   end
 end

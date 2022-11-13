@@ -8,7 +8,7 @@
 
 module Dependabot
   module Terraform
-    class Version < Gem::Version
+    class Version < Dependabot::Version
       def initialize(version)
         @version_string = version.to_s
         super
