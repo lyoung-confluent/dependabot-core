@@ -52,6 +52,7 @@ module Dependabot
           #{VERSION_WITH_SFX}|
           #{VERSION_WITH_PFX_AND_SFX}
       /x
+      DIGEST = /^sha256:[0-9a-f]{64}$/
 
       def latest_version
         latest_version_from(dependency.version)
@@ -124,10 +125,10 @@ module Dependabot
 
       def digest_up_to_date?
         dependency.requirements.all? do |req|
-          next true unless req.fetch(:source)[:digest]
-          next true unless (new_digest = digest_of(dependency.version))
+          next true unless (digest = req.fetch(:source)[:digest])
+          next true unless (new_digest = updated_digest)
 
-          req.fetch(:source).fetch(:digest) == new_digest
+          digest == new_digest
         end
       end
 
@@ -141,6 +142,7 @@ module Dependabot
       # NOTE: It's important that this *always* returns a version (even if
       # it's the existing one) as it is what we later check the digest of.
       def fetch_latest_version(version)
+        return latest_digest if version.match?(DIGEST)
         return version unless version.match?(NAME_WITH_VERSION)
 
         # Prune out any downgrade tags before checking for pre-releases
@@ -230,7 +232,11 @@ module Dependabot
       end
 
       def updated_digest
-        @updated_digest ||= digest_of(latest_version)
+        @updated_digest ||= if latest_version.match?(DIGEST)
+                              latest_digest
+                            else
+                              digest_of(latest_version)
+                            end
       end
 
       def tags_from_registry
