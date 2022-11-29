@@ -47,19 +47,16 @@ module Dependabot
         version_catalog_file.each do |toml_file|
           dependency_set += build_version_catalog_dependencies(toml_file)
         end
-        debugger
         dependency_set.dependencies
       end
 
       def build_version_catalog_dependencies(toml_file)
         dependency_set = DependencySet.new
-        versions = parsed_toml_file(toml_file)["versions"]
         libraries = parsed_toml_file(toml_file)["libraries"]
         libraries.each do |mod, declaration|
           modVersion = declaration["version"]["ref"]
-          version = versions[modVersion]
           group, name = declaration["module"].split(":")
-          details = { group: group, name: name, version: version }
+          details = { group: group, name: name, version:  "$"+modVersion }
           dependency_set << dependency_from(details_hash: details, buildfile: toml_file)
         end
         dependency_set
