@@ -14,6 +14,9 @@ module Dependabot
       SUPPORTED_SETTINGS_FILE_NAMES =
         %w(settings.gradle settings.gradle.kts).freeze
 
+      SUPPORTED_VERSION_CATALOG_FILE =
+      %w(libs.versions.toml).freeze
+
       def self.required_files_in?(filenames)
         filenames.any? do |filename|
           SUPPORTED_BUILD_FILE_NAMES.include?(filename)
@@ -33,11 +36,11 @@ module Dependabot
       end
 
       def all_buildfiles_in_build(root_dir)
-        files = [buildfile(root_dir), settings_file(root_dir)].compact
+        files = [buildfile(root_dir), settings_file(root_dir), version_catalog_file(root_dir)].compact
         files += subproject_buildfiles(root_dir)
         files += dependency_script_plugins(root_dir)
         files + included_builds(root_dir).
-                flat_map { |dir| all_buildfiles_in_build(dir) }
+                flat_map { |dir| all_buildfiles_in_build(dir) }              
       end
 
       def included_builds(root_dir)
@@ -81,6 +84,11 @@ module Dependabot
           nil
         end
       end
+
+      def version_catalog_file(root_dir)
+        builds = catalogFile(root_dir+"/gradle")
+        builds
+      end  
 
       # rubocop:disable Metrics/PerceivedComplexity
       def dependency_script_plugins(root_dir)
@@ -126,6 +134,12 @@ module Dependabot
         @buildfile_name ||= File.basename(file.name)
         file
       end
+
+      def catalogFile(dir)
+        file = find_first(dir, SUPPORTED_VERSION_CATALOG_FILE) || return
+        @buildfile_name ||= File.basename(file.name)
+        file
+      end  
 
       def settings_file(dir)
         find_first(dir, SUPPORTED_SETTINGS_FILE_NAMES)
