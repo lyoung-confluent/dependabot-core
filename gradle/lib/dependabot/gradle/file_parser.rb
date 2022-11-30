@@ -49,41 +49,7 @@ module Dependabot
         end
         dependency_set.dependencies
       end
-
-      # Only parses libraries for now, plugin are ignored
-      def version_catalog_dependencies(toml_file)
-        dependency_set = DependencySet.new
-        libraries = parsed_toml_file(toml_file)["libraries"]
-        libraries.each do |mod, declaration|
-          version = declaration["version"]["ref"]
-          group, name = declaration["module"].split(":")
-          details = { group: group, name: name, version:  "$"+version }
-          dependency_set << dependency_from(details_hash: details, buildfile: toml_file)
-        end
-        dependency_set
-      end 
-      
-      def versions_from_declaration(name, declaration)
-        declaration.fetch("versions", name)
-      end
-
-      def requirement_from_declaration(declaration)
-        if declaration.is_a?(String)
-          return declaration == "" ? nil : declaration
-        end
-        raise "Unexpected dependency declaration: #{declaration}" unless declaration.is_a?(Hash)
-        return declaration["version.ref"] if declaration["version.ref"].is_a?(String) && declaration["version.ref"] != ""
-
-        nil
-      end
-
-      def parsed_toml_file(file)
-        @parsed_file ||= {}
-        @parsed_file[file.name] ||= TomlRB.parse(file.content)
-      rescue TomlRB::ParseError, TomlRB::ValueOverwriteError
-        raise Dependabot::DependencyFileNotParseable, file.path
-      end
-
+  
       def self.find_include_names(buildfile)
         return [] unless buildfile
 
@@ -98,6 +64,26 @@ module Dependabot
       end
 
       private
+
+      # Only parses libraries for now, plugin are ignored
+      def version_catalog_dependencies(toml_file)
+        dependency_set = DependencySet.new
+        libraries = parsed_toml_file(toml_file)["libraries"]
+        libraries.each do |mod, declaration|
+          version = declaration["version"]["ref"]
+          group, name = declaration["module"].split(":")
+          details = { group: group, name: name, version:  "$"+version }
+          dependency_set << dependency_from(details_hash: details, buildfile: toml_file)
+        end
+        dependency_set
+      end 
+
+      def parsed_toml_file(file)
+        @parsed_file ||= {}
+        @parsed_file[file.name] ||= TomlRB.parse(file.content)
+      rescue TomlRB::ParseError, TomlRB::ValueOverwriteError
+        raise Dependabot::DependencyFileNotParseable, file.path
+      end
 
       def map_value_regex(key)
         /(?:^|\s|,|\()#{Regexp.quote(key)}(\s*=|:)\s*['"](?<value>[^'"]+)['"]/
