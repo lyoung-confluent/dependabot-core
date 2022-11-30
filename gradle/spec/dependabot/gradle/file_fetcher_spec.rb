@@ -45,7 +45,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
       stub_content_request("gradle?ref=sha", "contents_java.json")
       stub_content_request("?ref=sha", "contents_java.json")
       stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
-      stub_content_request("gradle/?ref=sha", "contents_java_basic_buildfile.json")
     end
 
     it "fetches the buildfile" do
