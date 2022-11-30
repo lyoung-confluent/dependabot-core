@@ -53,11 +53,30 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
       stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
     end
 
+    # it "test" do
+    #   VCR.use_cassette("libs.versions.toml") do
+    #     Net::HTTP.get_response(URI('https://api.github.com/repos/bigandroidenergies/version_catalog/contents/gradle/libs.versions.toml'))
+    #  end
+    # end
+
     it "fetches the buildfile" do
       expect(file_fetcher_instance.files.count).to eq(1)
       expect(file_fetcher_instance.files.map(&:name)).
         to match_array(%w(build.gradle))
     end
+
+    context "with version library" do 
+      before do
+        stub_content_request("gradle?ref=sha", "content_gradle_toml.json")
+        stub_content_request("gradle/libs.versions.toml?ref=sha", "libs_versions_toml.json")
+      end
+
+      it "fetches the toml file" do
+        expect(file_fetcher_instance.files.count).to eq(2)
+        expect(file_fetcher_instance.files.map(&:name)).
+          to match_array(%w(build.gradle gradle/libs.versions.toml))
+      end
+    end  
 
     context "with a settings.gradle" do
       before do
