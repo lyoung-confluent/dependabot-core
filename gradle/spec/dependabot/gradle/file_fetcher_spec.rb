@@ -46,12 +46,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
   before { allow(file_fetcher_instance).to receive(:commit).and_return("sha") }
 
-  # context "test call" do
-  #   VCR.use_cassette("gradle_folder_content") do
-  #      Net::HTTP.get_response(URI('https://api.github.com/repos/bigandroidenergies/no_version_catalog/contents/gradle'))
-  #   end
-  # end
-
   context "with a basic buildfile" do
     before do
       stub_no_content_request("gradle?ref=sha")
@@ -67,7 +61,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
     context "with a settings.gradle" do
       before do
-        stub_no_content_request("gradle?ref=sha")
         stub_content_request("?ref=sha", "contents_java_with_settings.json")
         stub_content_request("settings.gradle?ref=sha", "contents_java_simple_settings.json")
         stub_content_request("app/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
