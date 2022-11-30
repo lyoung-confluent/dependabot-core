@@ -84,6 +84,7 @@ module Dependabot
         end
       end
 
+      # For now only supports libray .toml files in the gradle folder
       def version_catalog_file(root_dir)
         return gradle_toml_file(root_dir)
       rescue Dependabot::DependencyFileNotFound

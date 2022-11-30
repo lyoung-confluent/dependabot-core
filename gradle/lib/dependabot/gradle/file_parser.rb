@@ -50,6 +50,7 @@ module Dependabot
         dependency_set.dependencies
       end
 
+      # Only parses libraries for now, plugin are ignored
       def version_catalog_dependencies(toml_file)
         dependency_set = DependencySet.new
         libraries = parsed_toml_file(toml_file)["libraries"]
