@@ -45,18 +45,18 @@ module Dependabot
           dependency_set += buildfile_dependencies(plugin_file)
         end
         version_catalog_file.each do |toml_file|
-          dependency_set += build_version_catalog_dependencies(toml_file)
+          dependency_set += version_catalog_dependencies(toml_file)
         end
         dependency_set.dependencies
       end
 
-      def build_version_catalog_dependencies(toml_file)
+      def version_catalog_dependencies(toml_file)
         dependency_set = DependencySet.new
         libraries = parsed_toml_file(toml_file)["libraries"]
         libraries.each do |mod, declaration|
-          modVersion = declaration["version"]["ref"]
+          version = declaration["version"]["ref"]
           group, name = declaration["module"].split(":")
-          details = { group: group, name: name, version:  "$"+modVersion }
+          details = { group: group, name: name, version:  "$"+version }
           dependency_set << dependency_from(details_hash: details, buildfile: toml_file)
         end
         dependency_set
