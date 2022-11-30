@@ -38,11 +38,23 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
     }]
   end
 
+  def stub_no_content_request(path)
+    stub_request(:get, File.join(url, path)).
+      with(headers: { "Authorization" => "token token" }).
+      to_return(status: 404)
+  end
+
   before { allow(file_fetcher_instance).to receive(:commit).and_return("sha") }
+
+  # context "test call" do
+  #   VCR.use_cassette("gradle_folder_content") do
+  #      Net::HTTP.get_response(URI('https://api.github.com/repos/bigandroidenergies/no_version_catalog/contents/gradle'))
+  #   end
+  # end
 
   context "with a basic buildfile" do
     before do
-      stub_content_request("gradle?ref=sha", "contents_java.json")
+      stub_no_content_request("gradle?ref=sha")
       stub_content_request("?ref=sha", "contents_java.json")
       stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
     end
