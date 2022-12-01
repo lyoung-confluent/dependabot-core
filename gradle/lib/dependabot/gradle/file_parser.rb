@@ -72,9 +72,10 @@ module Dependabot
         dependency_set = DependencySet.new
         libraries = parsed_toml_file(toml_file)["libraries"]
         libraries.each do |mod, declaration|
-          version = declaration["version"]["ref"]
+          version = declaration["version"]; next if version.nil?
+          version_details = version["ref"].nil? ? version : "$" + version["ref"]
           group, name = declaration["module"].split(":")
-          details = { group: group, name: name, version:  "$"+version }
+          details = { group: group, name: name, version: version_details }
           dependency_set << dependency_from(details_hash: details, buildfile: toml_file)
         end
         dependency_set
