@@ -804,44 +804,71 @@ RSpec.describe Dependabot::Gradle::FileParser do
       end
     end
 
-    context "with version catalog" do
-      let(:files) { [version_catalog] }
+    describe "with a version catalog file" do
+      let(:files) { [buildfile, version_catalog] }
       let(:version_catalog) do
         Dependabot::DependencyFile.new(
           name: "gradle/libs.versions.toml",
           content: fixture("version_catalog_file", "libs.versions.toml")
         )
       end
-      
-      its(:length) { is_expected.to eq(12) }
+
+      its(:length) { is_expected.to eq(31) }
 
       describe "the first dependency" do
         subject(:dependency) { dependencies.first }
-  
+
         it "has the right details" do
           expect(dependency).to be_a(Dependabot::Dependency)
-          expect(dependency.name).to eq("androidx.core:core-ktx")
-          expect(dependency.version).to eq("1.7.0")
+          expect(dependency.name).to eq("co.aikar:acf-paper")
+          expect(dependency.version).to eq("0.5.0-SNAPSHOT")
           expect(dependency.requirements).to eq(
             [{
-              requirement: "1.7.0",
-              file: "gradle/libs.versions.toml",
+              requirement: "0.5.0-SNAPSHOT",
+              file: "build.gradle",
               groups: [],
               source: nil,
-              metadata: { property_name: "corektx" }
+              metadata: nil
             }]
           )
         end
       end
 
-      describe "with a buildfile" do
-        let(:files) { [buildfile, version_catalog] }
+      describe "the last dependency" do
+        subject(:dependency) { dependencies.last }
+  
+        it "has the right details" do
+          expect(dependency).to be_a(Dependabot::Dependency)
+          expect(dependency.name).to eq("androidx.test.espresso:espresso-core")
+          expect(dependency.version).to eq("3.5.0")
+          expect(dependency.requirements).to eq(
+            [{
+              requirement: "3.5.0",
+              file: "gradle/libs.versions.toml",
+              groups: [],
+              source: nil,
+              metadata: { property_name: "espresso" }
+            }]
+          )
+        end
+      end
+      
+      context "with version catlog file containing depedency overlap" do
+        let(:files) { [buildfile, version_catalog_overlap] }
+
+        let(:version_catalog_overlap) do
+          Dependabot::DependencyFile.new(
+            name: "gradle/libs.versions.toml",
+            content: fixture("version_catalog_file", "libs.versions.overlapping.toml")
+          )
+        end
 
         its(:length) { is_expected.to eq(31) }
 
         describe "the first dependency" do
           subject(:dependency) { dependencies.first }
-
+  
+          # This test is wrong,  req should also contain changes in the version catalog file
           it "has the right details" do
             expect(dependency).to be_a(Dependabot::Dependency)
             expect(dependency.name).to eq("co.aikar:acf-paper")
@@ -857,29 +884,6 @@ RSpec.describe Dependabot::Gradle::FileParser do
             )
           end
         end
-
-        describe "the last dependency" do
-          subject(:dependency) { dependencies.last }
-    
-          it "has the right details" do
-            expect(dependency).to be_a(Dependabot::Dependency)
-            expect(dependency.name).to eq("androidx.test.espresso:espresso-core")
-            expect(dependency.version).to eq("3.5.0")
-            expect(dependency.requirements).to eq(
-              [{
-                requirement: "3.5.0",
-                file: "gradle/libs.versions.toml",
-                groups: [],
-                source: nil,
-                metadata: { property_name: "espresso" }
-              }]
-            )
-          end
-        end
-
-        ## Add here test for overlaping library declaration in build file and version catalog
-  
-
       end
     end
   end
