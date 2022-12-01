@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "toml-rb"
+
 require "dependabot/dependency"
 require "dependabot/file_parsers"
 require "dependabot/file_parsers/base"
