@@ -863,7 +863,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
           )
         end
 
-        its(:length) { is_expected.to eq(32) }
+        its(:length) { is_expected.to eq(31) }
 
         describe "the first dependency" do
           subject(:dependency) { dependencies.first }
@@ -880,10 +880,37 @@ RSpec.describe Dependabot::Gradle::FileParser do
                 groups: [],
                 source: nil,
                 metadata: nil
+              },
+              {
+                requirement: "0.5.0-SNAPSHOT",
+                file: "gradle/libs.versions.toml",
+                groups: [],
+                source: nil,
+                metadata: { property_name: "coAikar" }
               }]
             )
           end
         end
+
+        describe "the last dependency" do
+          subject(:dependency) { dependencies.last }
+    
+          it "has the right details" do
+            expect(dependency).to be_a(Dependabot::Dependency)
+            expect(dependency.name).to eq("androidx.test.espresso:espresso-core")
+            expect(dependency.version).to eq("3.5.0")
+            expect(dependency.requirements).to eq(
+              [{
+                requirement: "3.5.0",
+                file: "gradle/libs.versions.toml",
+                groups: [],
+                source: nil,
+                metadata: { property_name: "espresso" }
+              }]
+            )
+          end
+        end
+        
       end
     end
   end
