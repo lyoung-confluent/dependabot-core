@@ -14,7 +14,7 @@ module Dependabot
       SUPPORTED_SETTINGS_FILE_NAMES =
         %w(settings.gradle settings.gradle.kts).freeze
 
-      SUPPORTED_VERSION_CATALOG_FILE = %w(/gradle/libs.versions.toml).freeze
+      SUPPORTED_VERSION_CATALOG_FILE_PATH = %w(/gradle/libs.versions.toml).freeze
 
       def self.required_files_in?(filenames)
         filenames.any? do |filename|
@@ -84,9 +84,11 @@ module Dependabot
         end
       end
 
-      # For now only supports libray .toml files in the gradle folder
+      # For now only supports libray .toml files in the main gradle folder
       def version_catalog_file(root_dir)
-        return gradle_toml_file(root_dir)
+        return nil unless root_dir != "."
+
+        gradle_toml_file(root_dir)
       rescue Dependabot::DependencyFileNotFound
         # Catalog file it's optional for Gradle
         nil
@@ -138,7 +140,7 @@ module Dependabot
       end
 
       def gradle_toml_file(dir)
-        file = find_first(dir, SUPPORTED_VERSION_CATALOG_FILE) || return
+        file = find_first(dir, SUPPORTED_VERSION_CATALOG_FILE_PATH) || return
         @buildfile_name ||= File.basename(file.name)
         file
       end  
