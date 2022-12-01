@@ -853,7 +853,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
         end
       end
       
-      context "with version catlog file containing depedency overlap" do
+      context "with version catalog file containing depedency overlap with build file" do
         let(:files) { [buildfile, version_catalog_overlap] }
 
         let(:version_catalog_overlap) do
@@ -863,11 +863,11 @@ RSpec.describe Dependabot::Gradle::FileParser do
           )
         end
 
-        its(:length) { is_expected.to eq(31) }
+        its(:length) { is_expected.to eq(32) }
 
         describe "the first dependency" do
           subject(:dependency) { dependencies.first }
-  
+
           # This test is wrong,  req should also contain changes in the version catalog file
           it "has the right details" do
             expect(dependency).to be_a(Dependabot::Dependency)
