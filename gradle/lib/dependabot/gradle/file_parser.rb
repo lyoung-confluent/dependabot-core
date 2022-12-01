@@ -73,6 +73,11 @@ module Dependabot
         libraries = parsed_toml_file(toml_file)["libraries"]
         libraries.each do |mod, declaration|
           version = declaration["version"]; next if version.nil?
+          
+          # Only support basic version and reference formats for now,
+          # refrain from updating anything else as it's likely to be a very deliberate choice.
+          next if (version.is_a?(Hash) && (version.length != 1 || version["ref"].nil?)) || version.include?("[")
+          
           version_details = version["ref"].nil? ? version : "$" + version["ref"]
           group, name = declaration["module"].split(":")
           details = { group: group, name: name, version: version_details }
