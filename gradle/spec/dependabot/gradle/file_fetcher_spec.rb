@@ -53,12 +53,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
       stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
     end
 
-    # it "test" do
-    #   VCR.use_cassette("libs.versions.toml") do
-    #     Net::HTTP.get_response(URI('https://api.github.com/repos/bigandroidenergies/version_catalog/contents/gradle/libs.versions.toml'))
-    #  end
-    # end
-
     it "fetches the buildfile" do
       expect(file_fetcher_instance.files.count).to eq(1)
       expect(file_fetcher_instance.files.map(&:name)).
@@ -122,7 +116,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
     context "with included builds" do
       context "when has buildSrc" do
         before do
-          stub_no_content_request("buildSrc/gradle?ref=sha")
           stub_content_request("buildSrc?ref=sha", "contents_java.json")
           stub_content_request("buildSrc/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
         end
@@ -152,8 +145,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
         context "explicitly included" do
           before do
-            stub_no_content_request("gradle?ref=sha")
-            stub_no_content_request("included/gradle?ref=sha")
             stub_content_request("?ref=sha", "contents_java_with_buildsrc_and_settings.json")
             stub_content_request("settings.gradle?ref=sha", "contents_java_settings_explicit_buildsrc.json")
             stub_content_request("included?ref=sha", "contents_java.json")
@@ -173,8 +164,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
       context "when only one" do
         before do
-          stub_no_content_request("gradle?ref=sha")
-          stub_no_content_request("included/gradle?ref=sha")
           stub_content_request("?ref=sha", "contents_java_with_settings.json")
           stub_content_request("settings.gradle?ref=sha", "contents_java_settings_1_included_build.json")
           stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
@@ -198,9 +187,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
       context "when multiple" do
         before do
-          stub_no_content_request("gradle?ref=sha")
-          stub_no_content_request("included/gradle?ref=sha")
-          stub_no_content_request("included2/gradle?ref=sha")
           stub_content_request("?ref=sha", "contents_java_with_settings.json")
           stub_content_request("settings.gradle?ref=sha", "contents_java_settings_2_included_builds.json")
           stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
@@ -231,12 +217,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
       context "when nested included builds" do
         before do
-          stub_no_content_request("gradle?ref=sha")
-          stub_no_content_request("included/gradle?ref=sha")
-          stub_no_content_request("included/included/gradle?ref=sha")
-          stub_no_content_request("included/included/included/gradle?ref=sha")
-          stub_no_content_request("included/included/included/buildSrc/gradle?ref=sha")
-
           stub_content_request("?ref=sha", "contents_java_with_settings.json")
           stub_content_request("settings.gradle?ref=sha", "contents_java_settings_1_included_build.json")
           stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
@@ -276,8 +256,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
       context "containing a script plugin" do
         before do
-          stub_no_content_request("gradle?ref=sha")
-          stub_no_content_request("included/gradle?ref=sha")
           stub_content_request("?ref=sha", "contents_java_with_settings.json")
           stub_content_request("settings.gradle?ref=sha", "contents_java_settings_1_included_build.json")
           stub_content_request("build.gradle?ref=sha", "contents_java_buildfile_with_script_plugins.json")
@@ -302,9 +280,7 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
     end
 
     context "only a settings.gradle" do
-      debugger
       before do
-        stub_no_content_request("gradle?ref=sha")
         stub_content_request("?ref=sha", "contents_java_only_settings.json")
         stub_content_request("app?ref=sha", "contents_java_subproject.json")
         stub_content_request("settings.gradle?ref=sha", "contents_java_simple_settings.json")
@@ -319,7 +295,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
       context "with version catalog" do
         before do
-          stub_no_content_request("app/libs.versions.toml?ref=sha")
           stub_content_request("gradle?ref=sha", "content_gradle_toml.json")
           stub_content_request("gradle/libs.versions.toml?ref=sha", "libs_versions_toml.json")
         end
@@ -348,7 +323,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
 
       context "with a settings.gradle.kts" do
         before do
-          stub_no_content_request("gradle?ref=sha")
           stub_content_request("?ref=sha", "contents_kotlin_with_settings.json")
           stub_content_request("settings.gradle.kts?ref=sha", "contents_kotlin_simple_settings.json")
           stub_content_request("app/build.gradle.kts?ref=sha", "contents_kotlin_basic_buildfile.json")
