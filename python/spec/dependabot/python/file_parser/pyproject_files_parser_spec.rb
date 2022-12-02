@@ -305,7 +305,7 @@ RSpec.describe Dependabot::Python::FileParser::PyprojectFilesParser do
 
       subject(:dependencies) { parser.dependency_set.dependencies }
 
-      its(:length) { is_expected.to be.positive? }
+      its(:length) { is_expected.to be > 0 }
     end
   end
 end
