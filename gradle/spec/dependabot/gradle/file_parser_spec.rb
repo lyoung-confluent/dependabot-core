@@ -662,7 +662,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
           end
         end
       end
-      
+
       context "various different specifications" do
         let(:buildfile_fixture_name) { "duck_duck_go_build.gradle.kts" }
 
@@ -813,7 +813,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
         )
       end
 
-      its(:length) { is_expected.to eq(31) }
+      its(:length) { is_expected.to eq(32) }
 
       describe "the first dependency" do
         subject(:dependency) { dependencies.first }
@@ -835,8 +835,8 @@ RSpec.describe Dependabot::Gradle::FileParser do
       end
 
       describe "the last dependency" do
-        subject(:dependency) { dependencies.last }
-  
+        subject(:dependency) { dependencies[dependencies.length - 2] }
+
         it "has the right details" do
           expect(dependency).to be_a(Dependabot::Dependency)
           expect(dependency.name).to eq("androidx.test.espresso:espresso-core")
@@ -852,7 +852,26 @@ RSpec.describe Dependabot::Gradle::FileParser do
           )
         end
       end
-      
+
+      describe "the version catalog plugin" do
+        subject(:dependency) { dependencies.last }
+
+        it "has the right details" do
+          expect(dependency).to be_a(Dependabot::Dependency)
+          expect(dependency.name).to eq("org.jmailen.kotlinter")
+          expect(dependency.version).to eq("3.11.0")
+          expect(dependency.requirements).to eq(
+            [{
+              requirement: "3.11.0",
+              file: "gradle/libs.versions.toml",
+              groups: ["plugins"],
+              source: nil,
+              metadata: nil
+            }]
+          )
+        end
+      end
+
       context "with version catalog file containing depedency overlap with build file" do
         let(:files) { [buildfile, version_catalog_overlap] }
 
@@ -863,7 +882,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
           )
         end
 
-        its(:length) { is_expected.to eq(31) }
+        its(:length) { is_expected.to eq(32) }
 
         describe "the first dependency" do
           subject(:dependency) { dependencies.first }
@@ -881,20 +900,20 @@ RSpec.describe Dependabot::Gradle::FileParser do
                 source: nil,
                 metadata: nil
               },
-              {
-                requirement: "0.5.0-SNAPSHOT",
-                file: "gradle/libs.versions.toml",
-                groups: [],
-                source: nil,
-                metadata: { property_name: "coAikar" }
-              }]
+               {
+                 requirement: "0.5.0-SNAPSHOT",
+                 file: "gradle/libs.versions.toml",
+                 groups: [],
+                 source: nil,
+                 metadata: { property_name: "coAikar" }
+               }]
             )
           end
         end
 
         describe "the last dependency" do
-          subject(:dependency) { dependencies.last }
-    
+          subject(:dependency) { dependencies[dependencies.length - 2] }
+
           it "has the right details" do
             expect(dependency).to be_a(Dependabot::Dependency)
             expect(dependency.name).to eq("androidx.test.espresso:espresso-core")
@@ -910,7 +929,25 @@ RSpec.describe Dependabot::Gradle::FileParser do
             )
           end
         end
-        
+
+        describe "the version catalog plugin" do
+          subject(:dependency) { dependencies.last }
+
+          it "has the right details" do
+            expect(dependency).to be_a(Dependabot::Dependency)
+            expect(dependency.name).to eq("org.jmailen.kotlinter")
+            expect(dependency.version).to eq("3.11.0")
+            expect(dependency.requirements).to eq(
+              [{
+                requirement: "3.11.0",
+                file: "gradle/libs.versions.toml",
+                groups: ["plugins"],
+                source: nil,
+                metadata: nil
+              }]
+            )
+          end
+        end
       end
     end
   end

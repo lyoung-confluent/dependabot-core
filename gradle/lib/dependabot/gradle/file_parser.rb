@@ -51,7 +51,7 @@ module Dependabot
         end
         dependency_set.dependencies
       end
-  
+
       def self.find_include_names(buildfile)
         return [] unless buildfile
 
@@ -67,24 +67,50 @@ module Dependabot
 
       private
 
-      # Only parses libraries for now, plugin are ignored
       def version_catalog_dependencies(toml_file)
         dependency_set = DependencySet.new
-        libraries = parsed_toml_file(toml_file)["libraries"]
-        libraries.each do |mod, declaration|
-          version = declaration["version"]; next if version.nil?
-          
+        parsed_toml_file = parsed_toml_file(toml_file)
+        dependency_set += version_catalog_library_dependencies(parsed_toml_file, toml_file)
+        dependency_set += version_catalog_plugin_dependencies(parsed_toml_file, toml_file)
+        dependency_set
+      end
+
+      def version_catalog_library_dependencies(parsed_toml_file, buildfile)
+        dependency_set = DependencySet.new
+        libraries = parsed_toml_file["libraries"]
+        libraries.each do |_mod, declaration|
+          version = declaration["version"]
+          next if version.nil?
+
           # Only support basic version and reference formats for now,
           # refrain from updating anything else as it's likely to be a very deliberate choice.
           next if (version.is_a?(Hash) && (version.length != 1 || version["ref"].nil?)) || version.include?("[")
-          
+
           version_details = version["ref"].nil? ? version : "$" + version["ref"]
           group, name = declaration["module"].split(":")
           details = { group: group, name: name, version: version_details }
-          dependency_set << dependency_from(details_hash: details, buildfile: toml_file)
+          dependency_set << dependency_from(details_hash: details, buildfile: buildfile)
         end
         dependency_set
-      end 
+      end
+
+      def version_catalog_plugin_dependencies(parsed_toml_file, buildfile)
+        dependency_set = DependencySet.new
+        plugins = parsed_toml_file["plugins"]
+        plugins.each do |_mod, declaration|
+          version = declaration["version"]
+          next if version.nil?
+
+          # Only support basic version and reference formats for now,
+          # refrain from updating anything else as it's likely to be a very deliberate choice.
+          next if (version.is_a?(Hash) && (version.length != 1 || version["ref"].nil?)) || version.include?("[")
+
+          version_details = version["ref"].nil? ? version : "$" + version["ref"]
+          details = { group: "plugins", name: declaration["id"], version: version_details }
+          dependency_set << dependency_from(details_hash: details, buildfile: buildfile)
+        end
+        dependency_set
+      end
 
       def parsed_toml_file(file)
         @parsed_file ||= {}
@@ -349,7 +375,7 @@ module Dependabot
         @version_catalog_file ||= dependency_files.select do |f|
           f.name.end_with?("libs.versions.toml")
         end
-      end  
+      end
 
       def script_plugin_files
         @script_plugin_files ||=
