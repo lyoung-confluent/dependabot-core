@@ -867,7 +867,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
               groups: ["plugins"],
               source: nil,
               metadata: { property_name: "ktlint" }
-            },{
+            }, {
               requirement: "9.0.0",
               file: "gradle/libs.versions.toml",
               groups: ["plugins"],
