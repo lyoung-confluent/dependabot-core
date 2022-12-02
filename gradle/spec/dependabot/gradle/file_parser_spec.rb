@@ -813,7 +813,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
         )
       end
 
-      its(:length) { is_expected.to eq(31) }
+      its(:length) { is_expected.to eq(32) }
 
       describe "the first dependency" do
         subject(:dependency) { dependencies.first }
@@ -834,8 +834,8 @@ RSpec.describe Dependabot::Gradle::FileParser do
         end
       end
 
-      describe "the last dependency" do
-        subject(:dependency) { dependencies[dependencies.length - 2] }
+      describe "the last library dependency" do
+        subject(:dependency) { dependencies[dependencies.length - 3] }
 
         it "has the right details" do
           expect(dependency).to be_a(Dependabot::Dependency)
@@ -848,6 +848,31 @@ RSpec.describe Dependabot::Gradle::FileParser do
               groups: [],
               source: nil,
               metadata: { property_name: "espresso" }
+            }]
+          )
+        end
+      end
+
+      describe "the version catalog plugin" do
+        subject(:dependency) { dependencies.last }
+
+        it "has the right details" do
+          expect(dependency).to be_a(Dependabot::Dependency)
+          expect(dependency.name).to eq("org.jlleitschuh.gradle.ktlint")
+          expect(dependency.version).to eq("10.0.0")
+          expect(dependency.requirements).to eq(
+            [{
+              requirement: "10.0.0",
+              file: "gradle/libs.versions.toml",
+              groups: ["plugins"],
+              source: nil,
+              metadata: { property_name: "ktlint" }
+            },{
+              requirement: "9.0.0",
+              file: "gradle/libs.versions.toml",
+              groups: ["plugins"],
+              source: nil,
+              metadata: nil
             }]
           )
         end
@@ -880,25 +905,6 @@ RSpec.describe Dependabot::Gradle::FileParser do
         end
         it "has the right details" do
           expect(dependency).to be(nil)
-        end
-      end
-
-      describe "the version catalog plugin" do
-        subject(:dependency) { dependencies.last }
-
-        it "has the right details" do
-          expect(dependency).to be_a(Dependabot::Dependency)
-          expect(dependency.name).to eq("org.jmailen.kotlinter")
-          expect(dependency.version).to eq("3.11.0")
-          expect(dependency.requirements).to eq(
-            [{
-              requirement: "3.11.0",
-              file: "gradle/libs.versions.toml",
-              groups: ["plugins"],
-              source: nil,
-              metadata: nil
-            }]
-          )
         end
       end
 
