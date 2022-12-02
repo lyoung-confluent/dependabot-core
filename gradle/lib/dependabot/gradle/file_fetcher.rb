@@ -40,7 +40,7 @@ module Dependabot
         files += subproject_buildfiles(root_dir)
         files += dependency_script_plugins(root_dir)
         files + included_builds(root_dir).
-                flat_map { |dir| all_buildfiles_in_build(dir) }      
+                flat_map { |dir| all_buildfiles_in_build(dir) }
       end
 
       def included_builds(root_dir)
