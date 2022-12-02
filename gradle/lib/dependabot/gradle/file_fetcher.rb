@@ -40,7 +40,7 @@ module Dependabot
         files += subproject_buildfiles(root_dir)
         files += dependency_script_plugins(root_dir)
         files + included_builds(root_dir).
-                flat_map { |dir| all_buildfiles_in_build(dir) }              
+                flat_map { |dir| all_buildfiles_in_build(dir) }      
       end
 
       def included_builds(root_dir)
@@ -87,7 +87,7 @@ module Dependabot
 
       def version_catalog_file(root_dir)
         return nil unless root_dir == "."
-     
+
         gradle_toml_file(root_dir)
       rescue Dependabot::DependencyFileNotFound
         # Catalog file it's optional for Gradle
@@ -140,8 +140,8 @@ module Dependabot
       end
 
       def gradle_toml_file(dir)
-         find_first(dir, SUPPORTED_VERSION_CATALOG_FILE_PATH) || return
-      end  
+        find_first(dir, SUPPORTED_VERSION_CATALOG_FILE_PATH) || return
+      end
 
       def settings_file(dir)
         find_first(dir, SUPPORTED_SETTINGS_FILE_NAMES)

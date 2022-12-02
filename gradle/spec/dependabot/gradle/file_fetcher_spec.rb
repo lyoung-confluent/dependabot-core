@@ -59,7 +59,7 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
         to match_array(%w(build.gradle))
     end
 
-    context "with version catalog" do 
+    context "with version catalog" do
       before do
         stub_content_request("gradle?ref=sha", "content_gradle_toml.json")
         stub_content_request("gradle/libs.versions.toml?ref=sha", "libs_versions_toml.json")
@@ -70,7 +70,7 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
         expect(file_fetcher_instance.files.map(&:name)).
           to match_array(%w(build.gradle gradle/libs.versions.toml))
       end
-    end  
+    end
 
     context "with a settings.gradle" do
       before do
@@ -196,7 +196,6 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
           stub_content_request("included/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included/app/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included2?ref=sha", "contents_java_with_settings.json")
-         
           stub_content_request("included2/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included2/settings.gradle?ref=sha", "contents_java_simple_settings.json")
           stub_content_request("included2/app/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
@@ -222,12 +221,10 @@ RSpec.describe Dependabot::Gradle::FileFetcher do
           stub_content_request("build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("app/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included?ref=sha", "contents_java_with_settings.json")
-         
           stub_content_request("included/settings.gradle?ref=sha", "contents_java_settings_1_included_build.json")
           stub_content_request("included/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included/app/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included/included?ref=sha", "contents_java_with_settings.json")
-          
           stub_content_request("included/included/build.gradle?ref=sha", "contents_java_basic_buildfile.json")
           stub_content_request("included/included/settings.gradle?ref=sha",
                                "contents_java_settings_1_included_build.json")
