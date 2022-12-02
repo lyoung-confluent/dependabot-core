@@ -813,7 +813,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
         )
       end
 
-      its(:length) { is_expected.to eq(32) }
+      its(:length) { is_expected.to eq(31) }
 
       describe "the first dependency" do
         subject(:dependency) { dependencies.first }
@@ -853,6 +853,36 @@ RSpec.describe Dependabot::Gradle::FileParser do
         end
       end
 
+      describe "non-referenced version dependency" do
+        subject(:dependency) do
+          dependencies.find { |d| d.name == "androidx.activity:activity-compose" }
+        end
+
+        it "has the right details" do
+          expect(dependency).to be_a(Dependabot::Dependency)
+          expect(dependency.name).to eq("androidx.activity:activity-compose")
+          expect(dependency.version).to eq("1.3.1")
+          expect(dependency.requirements).to eq(
+            [{
+              requirement: "1.3.1",
+              file: "gradle/libs.versions.toml",
+              groups: [],
+              source: nil,
+              metadata: nil
+            }]
+          )
+        end
+      end
+
+      describe "rich version dependency is ignored" do
+        subject(:dependency) do
+          dependencies.find { |d| d.name == "androidx.compose.material:material" }
+        end
+        it "has the right details" do
+          expect(dependency).to be(nil)
+        end
+      end
+
       describe "the version catalog plugin" do
         subject(:dependency) { dependencies.last }
 
@@ -872,7 +902,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
         end
       end
 
-      context "with version catalog file containing depedency overlap with build file" do
+      context "with version catalog file containing dependency overlap with build file" do
         let(:files) { [buildfile, version_catalog_overlap] }
 
         let(:version_catalog_overlap) do
@@ -882,7 +912,7 @@ RSpec.describe Dependabot::Gradle::FileParser do
           )
         end
 
-        its(:length) { is_expected.to eq(32) }
+        its(:length) { is_expected.to eq(31) }
 
         describe "the first dependency" do
           subject(:dependency) { dependencies.first }
