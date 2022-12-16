@@ -43,7 +43,7 @@ RSpec.describe Dependabot::Composer::MetadataFinder do
 
   describe "#source_url" do
     subject(:source_url) { finder.source_url }
-    let(:packagist_url) { "https://packagist.org/p/monolog/monolog.json" }
+    let(:packagist_url) { "https://repo.packagist.org/p/monolog/monolog.json" }
 
     before do
       stub_request(:get, packagist_url).
@@ -68,14 +68,14 @@ RSpec.describe Dependabot::Composer::MetadataFinder do
           expect(WebMock).
             to have_requested(
               :get,
-              "https://packagist.org/p/monolog/monolog.json"
+              "https://repo.packagist.org/p/monolog/monolog.json"
             )
         end
       end
 
       context "when the package listing is for a different" do
         let(:dependency_name) { "monolog/something" }
-        let(:packagist_url) { "https://packagist.org/p/monolog/something.json" }
+        let(:packagist_url) { "https://repo.packagist.org/p/monolog/something.json" }
 
         it { is_expected.to be_nil }
       end
@@ -83,7 +83,7 @@ RSpec.describe Dependabot::Composer::MetadataFinder do
 
     context "when there is a bitbucket link in the packagist response" do
       let(:packagist_response) do
-        fixture("packagist_response_bitbucket.json")
+        fixture("packagist_response.json").gsub!("github.com", "bitbucket.org")
       end
 
       it { is_expected.to eq("https://bitbucket.org/Seldaek/monolog") }
@@ -96,7 +96,7 @@ RSpec.describe Dependabot::Composer::MetadataFinder do
 
     context "when there is not a source link in the packagist response" do
       let(:packagist_response) do
-        fixture("packagist_response_no_source.json")
+        fixture("packagist_response.json").gsub!("github.com", "example.com")
       end
 
       it { is_expected.to be_nil }
@@ -135,7 +135,7 @@ RSpec.describe Dependabot::Composer::MetadataFinder do
     end
 
     context "when the packagist link resolves to a redirect" do
-      let(:redirect_url) { "https://packagist.org/p/monolog/Monolog.json" }
+      let(:redirect_url) { "https://repo.packagist.org/p/monolog/Monolog.json" }
       let(:packagist_response) { fixture("packagist_response.json") }
 
       before do
