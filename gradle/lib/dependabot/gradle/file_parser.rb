@@ -77,6 +77,7 @@ module Dependabot
 
       def version_catalog_library_dependencies(parsed_toml_file, buildfile)
         return DependencySet.new unless parsed_toml_file["libraries"]
+
         dependency_set = DependencySet.new
         libraries = parsed_toml_file["libraries"]
         libraries.each do |_mod, declaration|
@@ -97,6 +98,7 @@ module Dependabot
 
       def version_catalog_plugin_dependencies(parsed_toml_file, buildfile)
         return DependencySet.new unless parsed_toml_file["plugins"]
+
         dependency_set = DependencySet.new
         plugins = parsed_toml_file["plugins"]
         plugins.each do |_mod, declaration|

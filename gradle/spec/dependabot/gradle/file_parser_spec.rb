@@ -995,9 +995,9 @@ RSpec.describe Dependabot::Gradle::FileParser do
           content: fixture("version_catalog_file", "libs.versions.only.libraries.toml")
         )
       end
-  
+
       its(:length) { is_expected.to eq(11) }
-    end  
+    end
 
     describe "perse only version catalog file that contains only plugins" do
       let(:files) { [version_catalog] }
@@ -1007,8 +1007,8 @@ RSpec.describe Dependabot::Gradle::FileParser do
           content: fixture("version_catalog_file", "libs.versions.only.plugins.toml")
         )
       end
-  
+
       its(:length) { is_expected.to eq(2) }
-    end  
+    end
   end
 end
