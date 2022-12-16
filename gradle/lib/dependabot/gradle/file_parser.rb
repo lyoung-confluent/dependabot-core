@@ -70,12 +70,13 @@ module Dependabot
       def version_catalog_dependencies(toml_file)
         dependency_set = DependencySet.new
         parsed_toml_file = parsed_toml_file(toml_file)
-        dependency_set += version_catalog_library_module_dependencies(parsed_toml_file, toml_file)
+        dependency_set += version_catalog_library_dependencies(parsed_toml_file, toml_file)
         dependency_set += version_catalog_plugin_dependencies(parsed_toml_file, toml_file)
         dependency_set
       end
 
-      def version_catalog_library_module_dependencies(parsed_toml_file, buildfile)
+      # rubocop:disable Metrics/PerceivedComplexity
+      def version_catalog_library_dependencies(parsed_toml_file, buildfile)
         return DependencySet.new unless parsed_toml_file["libraries"]
 
         dependency_set = DependencySet.new
@@ -89,21 +90,27 @@ module Dependabot
           next if (version.is_a?(Hash) && (version.length != 1 || version["ref"].nil?)) || version.include?("[")
 
           version_details = version["ref"].nil? ? version : "$" + version["ref"]
-
-          group, name = ""
-          if declaration["module"] != nil
-            group, name = declaration["module"].split(":")
-          elsif declaration["group"] != nil && declaration["name"] != nil
-            group = declaration["group"]
-            name = declaration["name"]
-          else
-            next
-          end
+          group, name = library_parse_declaration(declaration)
+          next if group.nil? || name.nil?
 
           details = { group: group, name: name, version: version_details }
           dependency_set << dependency_from(details_hash: details, buildfile: buildfile)
         end
         dependency_set
+      end
+
+      # rubocop:enable Metrics/PerceivedComplexity
+      def library_parse_declaration(declaration)
+        group, name = ""
+        if !declaration["module"].nil?
+          group, name = declaration["module"].split(":")
+        elsif !declaration["group"].nil? && !declaration["name"].nil?
+          group = declaration["group"]
+          name = declaration["name"]
+        else
+          [nil, nil]
+        end
+        [group, name]
       end
 
       def version_catalog_plugin_dependencies(parsed_toml_file, buildfile)
