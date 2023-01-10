@@ -72,8 +72,14 @@ module Dependabot
       response = fetch_raw_upload_pack_for(uri)
       return response.body if response.status == 200
 
-      response_with_git = fetch_raw_upload_pack_with_git_for(uri)
-      return response_with_git.body if response_with_git.status == 200
+      # if git is installed, try fetching with it in case something we need is configured in .gitconfig (like creds)
+      env = { "PATH" => ENV.fetch("PATH", nil) }
+      command = SharedHelpers.escape_command("git --version")
+      stdout, stderr, process = Open3.capture3(env, command)
+      if process.success?
+        response = fetch_raw_upload_pack_with_git_for(uri)
+        return response.body if response.status == 200
+      end
 
       raise Dependabot::GitDependenciesNotReachable, [uri] unless uri.match?(KNOWN_HOSTS)
 
@@ -109,15 +115,20 @@ module Dependabot
       service_pack_uri += ".git" unless service_pack_uri.end_with?(".git")
 
       env = { "PATH" => ENV.fetch("PATH", nil) }
-      command = "git ls-remote #{service_pack_uri}"
-      command = SharedHelpers.escape_command(command)
 
+      command = SharedHelpers.escape_command("git --version") # Is git present?
       stdout, stderr, process = Open3.capture3(env, command)
-      # package the command response like a HTTP response so error handling
-      # remains unchanged
+      if process.success?
+        command = "git ls-remote #{service_pack_uri}"
+        command = SharedHelpers.escape_command(command)
+        stdout, stderr, process = Open3.capture3(env, command)
+      end
+
+      # package the command response like a HTTP response so error handling remains unchanged
       if process.success?
         OpenStruct.new(body: stdout, status: 200)
       else
+        # this picks up the response from either `git --version` or `git ls-remote`, whichever fails first
         OpenStruct.new(body: stderr, status: 500)
       end
     end
