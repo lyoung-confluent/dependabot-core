@@ -52,6 +52,11 @@ build_image() {
     --build-arg "USER_GID=$(id -g)" \
     --cache-from "dependabot/dependabot-core:latest" \
     -t dependabot/dependabot-core .
+  docker build \
+    --build-arg OMNIBUS_VERSION=latest \
+    --build-arg BUILDKIT_INLINE_CACHE=1 \
+    -f Dockerfile.updater \
+    -t dependabot/dependabot-updater .
   echo "$(tput setaf 2)=> building image from $DOCKERFILE$(tput sgr0)"
   docker build --build-arg BUILDKIT_INLINE_CACHE=1 -t "$IMAGE_NAME" -f "$DOCKERFILE" .
 }
@@ -99,7 +104,7 @@ if [ "$#" -gt "0" ]; then
 fi
 
 echo "$(tput setaf 2)=> running docker development shell$(tput sgr0)"
-CODE_DIR="/home/dependabot/dependabot-core"
+CODE_DIR="/home/dependabot"
 touch .core-bash_history
 docker run --rm -ti \
   -v "$(pwd)/.core-bash_history:/home/dependabot/.bash_history" \
